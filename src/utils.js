@@ -36,15 +36,39 @@ function validateNumbers(numbers) {
 export function calculateResults(tickets, winningNumbers, bonusNumber) {
     const prizeTable = {
         6: 2000000000,
-        5.5: 30000000, // accounting for bonus
+        5.5: 30000000, // 5개 + 보너스
         5: 1500000,
         4: 50000,
         3: 5000,
     };
+
+    const results = { 3: 0, 4: 0, 5: 0, 5.5: 0, 6: 0 };
+    tickets.forEach(lotto => {
+        const match = lotto.getNumbers().filter(n => winningNumbers.includes(n)).length;
+        if (match >= 3) {
+        const key = match === 5 && lotto.getNumbers().includes(bonusNumber) ? 5.5 : match;
+        results[key]++;
+        }
+    });
+
+    const totalPrize = Object.entries(results).reduce(
+        (sum, [key, count]) => sum + prizeTable[key] * count, 0
+    );
+    const rate = ((totalPrize / (tickets.length * 1000)) * 100).toFixed(1);
+
+    return { results, rate };
 }
 
 export function printResults({ results, rate }) {
+    Console.print('당첨 통계\n---');
+    Console.print(`3개 일치 (5,000원) - ${results[3]}개`);
+    Console.print(`4개 일치 (50,000원) - ${results[4]}개`);
+    Console.print(`5개 일치 (1,500,000원) - ${results[5]}개`);
+    Console.print(`5개 일치, 보너스 볼 일치 (30,000,000원) - ${results[5.5]}개`);
+    Console.print(`6개 일치 (2,000,000,000원) - ${results[6]}개`);
+    Console.print(`총 수익률은 ${rate}%입니다.`);
 }
 
 export function formatLottoNumbers(numbers) {
+    return `[${numbers.join(', ')}]`;
 }
