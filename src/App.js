@@ -8,7 +8,6 @@ class App {
       await game.start();
     } catch (error) {
       Console.print(error.message);
-      throw error;
     }
   }
 }

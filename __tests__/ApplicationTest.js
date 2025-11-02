@@ -95,3 +95,32 @@ describe("로또 테스트", () => {
     await runException("1000j");
   });
 });
+
+describe('Error Tests', () => {
+  test('readAmount should throw error for invalid amount', async () => {
+    const logSpy = getLogSpy();
+    mockQuestions(['1000j']);
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[ERROR] 구입 금액은 1,000원 단위여야 합니다.'));
+  });
+
+  test('readWinningNumbers should throw error for invalid numbers', async () => {
+    const logSpy = getLogSpy();
+    mockQuestions(['1000', '1,2,3,4,5,5']);
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[ERROR] 당첨 번호에 중복이 있습니다.'));
+  });
+
+  test('readBonusNumber should throw error for invalid bonus number', async () => {
+    const logSpy = getLogSpy();
+    mockRandoms([
+      [8, 21, 23, 41, 42, 43],
+    ]);
+    mockQuestions(['1000', '1,2,3,4,5,6', '6']);
+    const app = new App();
+    await app.run();
+    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('[ERROR] 보너스 번호는 당첨 번호와 중복될 수 없습니다.'));
+  });
+});
